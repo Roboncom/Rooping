@@ -1,28 +1,11 @@
-export type LearnKind = 'word' | 'sentence'
-
-export interface LearnItem {
+export interface Passage {
   id: string
-  kind: LearnKind
-  en: string
-  ko: string
-}
-
-export type DeckMode = 'word' | 'sentence' | 'all'
-
-export interface Deck {
-  id: string
-  name: string
-  items: LearnItem[]
+  content: string
   createdAt: number
   updatedAt: number
 }
 
 export interface Settings {
   repeatCount: number
-  intervalMs: number
-  voice: 'alloy' | 'echo' | 'fable' | 'nova' | 'onyx' | 'shimmer'
   speed: number
-  shuffle: boolean
-  autoAdvanceMs: number
-  showKoreanFirst: boolean
 }
