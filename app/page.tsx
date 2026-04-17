@@ -260,7 +260,7 @@ export default function Home() {
         className="pointer-events-none fixed inset-0 -z-0 opacity-60"
         style={{
           background:
-            'radial-gradient(600px circle at 15% 0%, rgba(52,211,153,0.10), transparent 60%), radial-gradient(500px circle at 90% 100%, rgba(134,239,172,0.06), transparent 60%)',
+            'radial-gradient(600px circle at 15% 0%, rgba(197,225,165,0.10), transparent 60%), radial-gradient(500px circle at 90% 100%, rgba(156,204,101,0.07), transparent 60%)',
         }}
       />
 

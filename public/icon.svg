@@ -1,12 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <radialGradient id="bg" cx="50%" cy="40%" r="65%">
-      <stop offset="0%" stop-color="#143526"/>
-      <stop offset="100%" stop-color="#07130d"/>
+      <stop offset="0%" stop-color="#213a1e"/>
+      <stop offset="100%" stop-color="#0a1708"/>
+    </radialGradient>
+    <radialGradient id="leaf" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#c5e1a5"/>
+      <stop offset="100%" stop-color="#9ccc65"/>
     </radialGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="160" fill="none" stroke="#34d399" stroke-width="22" stroke-dasharray="90 40" stroke-linecap="round"/>
-  <circle cx="256" cy="256" r="90" fill="#34d399"/>
-  <text x="256" y="286" font-family="Space Grotesk, sans-serif" font-size="90" font-weight="700" fill="#07130d" text-anchor="middle">R</text>
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#9ccc65" stroke-width="22" stroke-dasharray="90 40" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="90" fill="url(#leaf)"/>
+  <text x="256" y="286" font-family="Space Grotesk, sans-serif" font-size="90" font-weight="700" fill="#0a1708" text-anchor="middle">R</text>
 </svg>
