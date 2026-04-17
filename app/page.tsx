@@ -51,6 +51,7 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const audioCacheRef = useRef<Map<string, string>>(new Map())
   const cancelRef = useRef(false)
+  const skipModeResetRef = useRef(false)
 
   const filteredItems = useMemo(() => {
     const base = mode === 'all' ? allItems : allItems.filter(i => i.kind === mode)
@@ -103,8 +104,12 @@ export default function Home() {
     try { localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(Array.from(learnedIds))) } catch {}
   }, [learnedIds])
 
-  // Reset index when mode/filter changes
+  // Reset index when mode/filter changes (but not when saveEdit navigates us there)
   useEffect(() => {
+    if (skipModeResetRef.current) {
+      skipModeResetRef.current = false
+      return
+    }
     setCurrentIndex(0)
     setShowMeaning(false)
   }, [mode, settings.shuffle])
@@ -288,20 +293,37 @@ export default function Home() {
   const handleSaveEdit = () => {
     const parsed = parseList(editText, editKind)
     if (parsed.length === 0) return
+
     let next: LearnItem[]
     if (editStrategy === 'replace') {
       if (editKind === 'auto') {
-        next = parsed
+        next = dedupe(parsed)
       } else {
         const other = allItems.filter(i => i.kind !== editKind)
-        next = [...other, ...parsed]
+        next = dedupe([...other, ...parsed])
       }
     } else {
       next = dedupe([...allItems, ...parsed])
     }
+
+    // 붙여넣은 항목들로 학습 가능하도록 적절한 모드로 자동 전환
+    const hasWord = parsed.some(i => i.kind === 'word')
+    const hasSent = parsed.some(i => i.kind === 'sentence')
+    const targetMode: DeckMode = hasWord && hasSent ? 'all' : hasSent ? 'sentence' : 'word'
+
+    // 방금 붙여넣은 첫 항목의 위치 찾기 (셔플 시에는 0번으로)
+    const firstParsed = parsed[0]
+    const filtered = targetMode === 'all' ? next : next.filter(i => i.kind === targetMode)
+    const targetIdx = settings.shuffle
+      ? 0
+      : Math.max(0, filtered.findIndex(i => i.id === firstParsed.id))
+
+    skipModeResetRef.current = true
     setAllItems(next)
+    setMode(targetMode)
+    setShowMeaning(false)
     setEditMode(false)
-    setCurrentIndex(0)
+    setCurrentIndex(targetIdx)
   }
 
   const progressPct = totalCount > 0 ? ((safeIndex + 1) / totalCount) * 100 : 0
@@ -349,14 +371,14 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Mode tabs */}
+        {/* Mode tabs + 입력 */}
         <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] mb-4">
           {MODES.map(m => (
             <button
               key={m.id}
-              onClick={() => setMode(m.id)}
+              onClick={() => { setMode(m.id); setEditMode(false) }}
               className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                mode === m.id
+                mode === m.id && !editMode
                   ? 'bg-[var(--color-accent-muted)] text-[var(--color-accent)] shadow-[inset_0_0_0_1px_var(--color-accent-muted)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
               }`}
@@ -367,6 +389,20 @@ export default function Home() {
               </span>
             </button>
           ))}
+          <button
+            onClick={() => { if (editMode) setEditMode(false); else openEditor('auto') }}
+            title="단어·문장 복붙해서 저장 + 반복학습"
+            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
+              editMode
+                ? 'bg-[var(--color-accent)] text-[#080c0a] shadow-[0_0_16px_rgba(52,211,153,0.35)]'
+                : 'text-[var(--color-accent)] border border-dashed border-[var(--color-border-hover)] hover:bg-[var(--color-accent-soft)]'
+            }`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            입력
+          </button>
         </div>
 
         {/* Progress */}
