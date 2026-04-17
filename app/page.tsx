@@ -272,12 +272,12 @@ export default function Home() {
             {editTargetId === null && passages.length > 0 && (
               <button
                 onClick={openNew}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-base font-semibold
                   text-[var(--color-accent)] border border-dashed border-[var(--color-border-hover)]
                   hover:bg-[var(--color-accent-soft)] transition-all active:scale-95 no-select"
                 title="새 글 입력"
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 입력
@@ -291,23 +291,23 @@ export default function Home() {
           <div className="mb-4 animate-fade-in-up">
             <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:p-5">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-semibold">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xl font-bold">
                     {editTargetId ? '수정' : '입력'}
                   </h3>
-                  <span className="text-[10px] font-mono text-[var(--color-text-muted)]">
+                  <span className="text-xs font-mono text-[var(--color-text-muted)]">
                     {editText.trim().length}
                   </span>
                 </div>
                 <button
                   onClick={handlePaste}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium
                     border border-[var(--color-border)] text-[var(--color-text-muted)]
                     hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]
                     hover:bg-[var(--color-accent-soft)] transition-all active:scale-95 no-select"
                   title="클립보드에서 붙여넣기"
                 >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                     <rect x="8" y="2" width="8" height="4" rx="1" />
                   </svg>
@@ -319,27 +319,27 @@ export default function Home() {
                 onChange={e => setEditText(e.target.value)}
                 rows={9}
                 autoFocus
-                className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-3 text-base
+                className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 text-lg sm:text-xl
                   focus:border-[var(--color-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]
-                  resize-none leading-relaxed"
+                  resize-none leading-[1.55]"
               />
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={handlePlay}
                   disabled={!editText.trim()}
-                  className="flex-1 px-4 py-3 rounded-xl text-base font-semibold
+                  className="flex-1 px-4 py-4 rounded-xl text-xl font-bold
                     bg-[var(--color-accent)] text-[var(--color-bg)] hover:bg-[var(--color-accent-hover)]
                     active:scale-[0.98] transition-all shadow-[var(--shadow-glow)]
                     disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   플레이
                 </button>
                 <button
                   onClick={closeEditor}
-                  className="px-4 py-3 rounded-xl text-sm border border-[var(--color-border)]
+                  className="px-5 py-4 rounded-xl text-base font-medium border border-[var(--color-border)]
                     hover:bg-[var(--color-surface-hover)] transition-colors"
                 >
                   취소
@@ -407,8 +407,8 @@ export default function Home() {
                 </div>
 
                 <div className="pt-10 pb-2">
-                  <div className="max-h-[40dvh] sm:max-h-[48dvh] overflow-y-auto pr-1 -mr-1">
-                    <p className="font-[var(--font-display)] text-lg sm:text-2xl leading-relaxed whitespace-pre-wrap break-words">
+                  <div className="max-h-[42dvh] sm:max-h-[50dvh] overflow-y-auto pr-1 -mr-1">
+                    <p className="font-[var(--font-display)] text-2xl sm:text-3xl leading-[1.55] whitespace-pre-wrap break-words">
                       {currentPassage.content}
                     </p>
                   </div>
@@ -471,16 +471,16 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {/* 반복 */}
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] font-mono">반복</span>
+              <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-mono">반복</span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setSettings(s => {
                     const i = REPEAT_OPTIONS.indexOf(s.repeatCount)
                     return { ...s, repeatCount: REPEAT_OPTIONS[Math.max(0, i - 1)] ?? s.repeatCount }
                   })}
-                  className="w-7 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  className="w-9 h-11 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
                 >−</button>
-                <div className="flex-1 h-9 flex items-center justify-center rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-accent)]">
+                <div className="flex-1 h-11 flex items-center justify-center rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] text-lg font-bold text-[var(--color-accent)]">
                   {settings.repeatCount}
                 </div>
                 <button
@@ -488,22 +488,22 @@ export default function Home() {
                     const i = REPEAT_OPTIONS.indexOf(s.repeatCount)
                     return { ...s, repeatCount: REPEAT_OPTIONS[Math.min(REPEAT_OPTIONS.length - 1, i + 1)] ?? s.repeatCount }
                   })}
-                  className="w-7 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  className="w-9 h-11 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
                 >+</button>
               </div>
             </div>
             {/* 배속 */}
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] font-mono">배속</span>
+              <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-mono">배속</span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setSettings(s => {
                     const i = SPEED_OPTIONS.indexOf(s.speed)
                     return { ...s, speed: SPEED_OPTIONS[Math.max(0, i - 1)] ?? s.speed }
                   })}
-                  className="w-7 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  className="w-9 h-11 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
                 >−</button>
-                <div className="flex-1 h-9 flex items-center justify-center rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-accent)]">
+                <div className="flex-1 h-11 flex items-center justify-center rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] text-lg font-bold text-[var(--color-accent)]">
                   {settings.speed}x
                 </div>
                 <button
@@ -511,22 +511,22 @@ export default function Home() {
                     const i = SPEED_OPTIONS.indexOf(s.speed)
                     return { ...s, speed: SPEED_OPTIONS[Math.min(SPEED_OPTIONS.length - 1, i + 1)] ?? s.speed }
                   })}
-                  className="w-7 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  className="w-9 h-11 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
                 >+</button>
               </div>
             </div>
             {/* 목소리 */}
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] font-mono">목소리</span>
-              <div className="relative h-9">
+              <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-mono">목소리</span>
+              <div className="relative h-11">
                 <select
                   value={settings.voice}
                   onChange={e => setSettings(s => ({ ...s, voice: e.target.value as Voice }))}
-                  className="w-full h-9 appearance-none bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 text-sm font-semibold text-[var(--color-accent)] focus:border-[var(--color-accent)] focus:outline-none capitalize"
+                  className="w-full h-11 appearance-none bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 pr-8 text-lg font-bold text-[var(--color-accent)] focus:border-[var(--color-accent)] focus:outline-none capitalize"
                 >
                   {VOICE_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
                 </select>
-                <svg className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -538,10 +538,10 @@ export default function Home() {
         {passages.length > 0 && (
           <section className="mt-5">
             <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] font-mono">반복이력</h3>
-              <span className="text-[10px] text-[var(--color-text-muted)] font-mono">{passages.length}개</span>
+              <h3 className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-mono">반복이력</h3>
+              <span className="text-xs text-[var(--color-text-muted)] font-mono">{passages.length}개</span>
             </div>
-            <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1 -mr-1">
+            <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1 -mr-1">
               {passages.map(p => {
                 const isActive = currentId === p.id && editTargetId === null
                 return (
@@ -555,19 +555,19 @@ export default function Home() {
                   >
                     <button
                       onClick={() => selectPassage(p.id)}
-                      className="flex-1 text-left px-3 py-2.5 text-xs min-w-0 no-select"
+                      className="flex-1 text-left px-3 py-3 text-base min-w-0 no-select"
                       title={p.content}
                     >
-                      <span className={`block truncate leading-snug ${isActive ? 'text-[var(--color-accent)] font-medium' : 'text-[var(--color-text)]'}`}>
-                        {truncateTitle(p.content, 48)}
+                      <span className={`block truncate leading-snug ${isActive ? 'text-[var(--color-accent)] font-semibold' : 'text-[var(--color-text)]'}`}>
+                        {truncateTitle(p.content, 40)}
                       </span>
                     </button>
                     <button
                       onClick={() => handleDelete(p.id)}
                       aria-label="삭제"
-                      className="flex-shrink-0 p-2 text-[var(--color-text-muted)] hover:text-[var(--color-error)] transition-colors"
+                      className="flex-shrink-0 p-2.5 text-[var(--color-text-muted)] hover:text-[var(--color-error)] transition-colors"
                     >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="3 6 5 6 21 6" />
                         <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6" />
                       </svg>
