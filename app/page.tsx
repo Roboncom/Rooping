@@ -55,7 +55,7 @@ export default function Home() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const cancelRef = useRef(false)
-  const { analyserRef, connect: connectAnalyser } = useAudioAnalyser()
+  const { analyserRef, connect: connectAnalyser, unlock: unlockAudio } = useAudioAnalyser()
 
   // 단일 audio element를 만들어 analyser에 연결 (MediaElementSource는 요소당 1회만 가능)
   const ensureAudio = useCallback(() => {
@@ -234,6 +234,8 @@ export default function Home() {
   const handlePlay = () => {
     const content = editText.trim()
     if (!content) return
+    // user gesture 안에서 AudioContext 언락 (iOS Safari)
+    unlockAudio()
     const now = Date.now()
     let targetId: string
     let saved: Passage
@@ -433,7 +435,11 @@ export default function Home() {
             {/* Play 버튼만 중앙 */}
             <div className="flex items-center justify-center mt-5 sm:mt-7 no-select">
               <button
-                onClick={() => { if (isPlaying) stopAudio(); else playCurrent() }}
+                onClick={() => {
+                  // iOS Safari: AudioContext를 user gesture 안에서 resume
+                  unlockAudio()
+                  if (isPlaying) stopAudio(); else playCurrent()
+                }}
                 disabled={!currentPassage}
                 aria-label={isPlaying ? '정지' : '재생'}
                 className="w-20 h-20 sm:w-[68px] sm:h-[68px] flex items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-bg)] hover:bg-[var(--color-accent-hover)]

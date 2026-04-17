@@ -4,9 +4,8 @@ import { RefObject, useEffect, useRef } from 'react'
 
 /**
  * 실시간 주파수 스펙트럼 바 이퀄라이저.
- * analyserRef가 연결돼 있으면 AnalyserNode의 getByteFrequencyData를 RAF로 읽어
- * 각 바의 높이를 실제 음파 데이터로 갱신한다.
- * analyser 없으면 아이들 상태(바닥 ambient)만 표시.
+ * analyserRef가 유효한 데이터를 주면 그걸 쓰고,
+ * 모바일/CORS/iOS 등으로 0만 돌아오면 sin 기반 폴백 애니메이션.
  */
 export function Equalizer({
   isPlaying,
@@ -24,41 +23,49 @@ export function Equalizer({
   useEffect(() => {
     const render = () => {
       const analyser = analyserRef?.current ?? null
+      let haveRealData = false
       if (analyser) {
         if (dataRef.current.length !== analyser.frequencyBinCount) {
           dataRef.current = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount))
         }
         analyser.getByteFrequencyData(dataRef.current)
+        // 무음 감지: 전구간 합이 미미하면 폴백으로
+        let sum = 0
+        for (let i = 0; i < dataRef.current.length; i++) sum += dataRef.current[i]
+        haveRealData = sum > 8
+      }
 
-        // 음성 대역(대략 80~4kHz)에 해당하는 bin 위주로 골라 시각화
+      if (haveRealData) {
+        // 음성 대역 중심(bin 2 ~ 78% 구간)
         const binCount = dataRef.current.length
         const startBin = 2
         const endBin = Math.max(startBin + bars, Math.floor(binCount * 0.78))
         const usable = endBin - startBin
-
         for (let i = 0; i < bars; i++) {
           const el = barRefs.current[i]
           if (!el) continue
           if (isPlaying) {
             const bin = startBin + Math.floor((i * usable) / bars)
             const v = dataRef.current[bin] || 0
-            // 0~255 → 8~100% (감도 약간 부스트)
             const pct = Math.min(100, 8 + (v / 255) * 120)
             el.style.height = `${pct}%`
           } else {
-            // 멈춤 상태 — 바닥 ambient로 서서히 복귀
             el.style.height = '7%'
           }
         }
       } else {
-        // Analyser 없을 때 폴백 애니메이션
+        // sin 기반 폴백 (분석기 무응답이거나 analyser 없음)
         const t = performance.now() / 1000
         for (let i = 0; i < bars; i++) {
           const el = barRefs.current[i]
           if (!el) continue
           if (isPlaying) {
-            const v = 28 + Math.abs(Math.sin(t * 2.2 + i * 0.45)) * 60
-            el.style.height = `${v}%`
+            // 여러 주파수를 겹쳐 자연스러운 흔들림
+            const v =
+              30 +
+              Math.abs(Math.sin(t * 2.4 + i * 0.42)) * 35 +
+              Math.abs(Math.sin(t * 3.7 + i * 0.27)) * 25
+            el.style.height = `${Math.min(100, v)}%`
           } else {
             el.style.height = '7%'
           }
@@ -80,7 +87,7 @@ export function Equalizer({
           style={{
             height: '7%',
             backgroundColor: `rgba(156, 204, 101, ${0.4 + (i / bars) * 0.55})`,
-            transition: 'height 30ms linear',
+            transition: 'height 50ms linear',
           }}
         />
       ))}

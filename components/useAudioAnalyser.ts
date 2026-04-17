@@ -55,5 +55,14 @@ export function useAudioAnalyser() {
     [ensure]
   )
 
-  return { analyserRef, connect }
+  /** user gesture에서 즉시 호출해 AudioContext를 깨움 (iOS Safari) */
+  const unlock = useCallback(() => {
+    const pair = ensure()
+    if (!pair) return
+    if (pair.ctx.state === 'suspended') {
+      pair.ctx.resume().catch(() => {})
+    }
+  }, [ensure])
+
+  return { analyserRef, connect, unlock }
 }
