@@ -6,6 +6,7 @@ import { SAMPLE_PASSAGES } from '@/lib/sample'
 import { Logo } from '@/components/Logo'
 import { Equalizer } from '@/components/Equalizer'
 import { TimerRing } from '@/components/TimerRing'
+import { useAudioAnalyser } from '@/components/useAudioAnalyser'
 
 const STORAGE_KEYS = {
   passages: 'rooping.passages.v2',
@@ -54,6 +55,18 @@ export default function Home() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const cancelRef = useRef(false)
+  const { analyserRef, connect: connectAnalyser } = useAudioAnalyser()
+
+  // 단일 audio element를 만들어 analyser에 연결 (MediaElementSource는 요소당 1회만 가능)
+  const ensureAudio = useCallback(() => {
+    if (!audioRef.current) {
+      const a = new Audio()
+      a.preload = 'auto'
+      audioRef.current = a
+    }
+    connectAnalyser(audioRef.current)
+    return audioRef.current
+  }, [connectAnalyser])
 
   const currentPassage =
     passages.find(p => p.id === currentId) ?? passages[0] ?? null
@@ -98,8 +111,7 @@ export default function Home() {
       audioRef.current.onended = null
       audioRef.current.onerror = null
       audioRef.current.pause()
-      audioRef.current.src = ''
-      audioRef.current = null
+      // src는 비우지 않는다 — 같은 audio element를 재사용해 analyser 연결 유지
     }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel()
@@ -114,9 +126,8 @@ export default function Home() {
         if (cancelRef.current) { resolve(); return }
         try {
           const url = ttsUrl(text, voice, speed)
-          const audio = new Audio(url)
-          audio.preload = 'auto'
-          audioRef.current = audio
+          const audio = ensureAudio()
+          audio.src = url
           setIsPlaying(true)
           audio.onended = () => { setIsPlaying(false); resolve() }
           audio.onerror = () => {
@@ -140,7 +151,7 @@ export default function Home() {
         }
       })
     },
-    []
+    [ensureAudio]
   )
 
   const playCurrent = useCallback(async (passage?: Passage) => {
@@ -413,25 +424,14 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="my-4 sm:my-5">
-                    <Equalizer isPlaying={isPlaying} />
+                    <Equalizer isPlaying={isPlaying} analyserRef={analyserRef} />
                   </div>
                 </div>
               </div>
             ) : null}
 
-            {/* Controls */}
-            <div className="flex items-center justify-center gap-4 sm:gap-5 mt-5 sm:mt-7 no-select">
-              <button
-                onClick={goPrev}
-                aria-label="이전"
-                disabled={passages.length < 2}
-                className="w-14 h-14 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]
-                  hover:border-[var(--color-border-hover)] transition-all active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 18l-6-6 6-6" />
-                </svg>
-              </button>
+            {/* Play 버튼만 중앙 */}
+            <div className="flex items-center justify-center mt-5 sm:mt-7 no-select">
               <button
                 onClick={() => { if (isPlaying) stopAudio(); else playCurrent() }}
                 disabled={!currentPassage}
@@ -450,17 +450,6 @@ export default function Home() {
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 )}
-              </button>
-              <button
-                onClick={goNext}
-                aria-label="다음"
-                disabled={passages.length < 2}
-                className="w-14 h-14 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]
-                  hover:border-[var(--color-border-hover)] transition-all active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
               </button>
             </div>
           </div>
