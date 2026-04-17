@@ -301,17 +301,17 @@ export default function Home() {
                 </div>
                 <button
                   onClick={handlePaste}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium
+                  aria-label="클립보드에서 붙여넣기"
+                  title="클립보드에서 붙여넣기"
+                  className="w-11 h-11 flex items-center justify-center rounded-lg
                     border border-[var(--color-border)] text-[var(--color-text-muted)]
                     hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]
                     hover:bg-[var(--color-accent-soft)] transition-all active:scale-95 no-select"
-                  title="클립보드에서 붙여넣기"
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                     <rect x="8" y="2" width="8" height="4" rx="1" />
                   </svg>
-                  복붙
                 </button>
               </div>
               <textarea
