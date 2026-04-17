@@ -428,14 +428,15 @@ export default function Home() {
           const parsed = parseList(editText, editKind)
           const wordCnt = parsed.filter(i => i.kind === 'word').length
           const sentCnt = parsed.filter(i => i.kind === 'sentence').length
+          const withKo = parsed.filter(i => i.ko).length
           return (
             <div className="mb-5 animate-fade-in-up">
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                 <div className="mb-3">
-                  <h3 className="text-sm font-semibold mb-1">단어·문장 붙여넣기</h3>
+                  <h3 className="text-sm font-semibold mb-1">반복 학습할 내용 입력</h3>
                   <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
-                    한 줄에 하나씩 <span className="font-mono text-[var(--color-accent)]">영어, 한국어</span> 형식으로 붙여넣으세요.<br />
-                    구분자는 <span className="font-mono">, / Tab / | / =</span> 중 무엇이든 OK — 마지막 구분자 기준으로 분리됩니다.
+                    <strong className="text-[var(--color-text)]">한 줄에 한 개</strong> — 단어·문장 무엇이든, 영어·한국어 섞여도 OK.<br />
+                    원하면 <span className="font-mono text-[var(--color-accent)]">영어, 뜻</span> 형식으로 붙여도 자동 인식됩니다.
                   </p>
                 </div>
 
@@ -491,10 +492,13 @@ export default function Home() {
                   className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-3 text-sm font-mono
                     focus:border-[var(--color-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]
                     placeholder:text-[var(--color-text-muted)] resize-none"
-                  placeholder={`ubiquitous, 어디에나 있는
+                  placeholder={`ubiquitous
+resilient
+Let me think about it.
+Could you say that again?
+---- 또는 뜻과 함께 ----
 ephemeral, 일시적인
-Could you say that again?, 다시 말씀해 주시겠어요?
-Let me think about it, 생각해 볼게요`}
+What time works best for you?, 어떤 시간이 가장 좋으세요?`}
                 />
 
                 {/* 미리보기 요약 */}
@@ -502,6 +506,7 @@ Let me think about it, 생각해 볼게요`}
                   <span>
                     총 <span className="text-[var(--color-accent)]">{parsed.length}</span>개 ·
                     단어 {wordCnt} · 문장 {sentCnt}
+                    {withKo > 0 && <> · 뜻 {withKo}</>}
                   </span>
                   <button
                     onClick={handleLoadCurrent}
@@ -709,13 +714,15 @@ Let me think about it, 생각해 볼게요`}
                   <Equalizer isPlaying={isPlaying} />
                 </div>
 
-                <div
-                  className={`text-lg sm:text-xl transition-all duration-300 ${
-                    showMeaning ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-                  }`}
-                >
-                  <span className="text-[var(--color-text-secondary)]">{currentItem.ko}</span>
-                </div>
+                {currentItem.ko && (
+                  <div
+                    className={`text-lg sm:text-xl transition-all duration-300 ${
+                      showMeaning ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                    }`}
+                  >
+                    <span className="text-[var(--color-text-secondary)]">{currentItem.ko}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -765,12 +772,14 @@ Let me think about it, 생각해 볼게요`}
             </button>
           </div>
 
-          <button
-            onClick={() => setShowMeaning(s => !s)}
-            className="mt-3 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors font-mono"
-          >
-            {showMeaning ? '뜻 숨기기 (M)' : '뜻 보기 (M)'}
-          </button>
+          {currentItem.ko && (
+            <button
+              onClick={() => setShowMeaning(s => !s)}
+              className="mt-3 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors font-mono"
+            >
+              {showMeaning ? '뜻 숨기기 (M)' : '뜻 보기 (M)'}
+            </button>
+          )}
         </div>
 
         {/* Bottom bar: auto + quick settings */}
