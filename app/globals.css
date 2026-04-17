@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* ===== 테마 CSS 변수 (Midnight Emerald) ===== */
+:root {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-bg: #080c0a;
+  --color-bg-gradient: radial-gradient(ellipse at top, #0a1612 0%, #080c0a 55%);
+  --color-surface: #0f1512;
+  --color-surface-hover: #151d19;
+  --color-surface-elevated: #131b17;
+  --color-accent: #34d399;
+  --color-accent-hover: #6ee7b7;
+  --color-accent-muted: rgba(52, 211, 153, 0.15);
+  --color-accent-soft: rgba(52, 211, 153, 0.08);
+  --color-text: #f0fdf4;
+  --color-text-secondary: #86efac;
+  --color-text-muted: #6b7280;
+  --color-border: rgba(52, 211, 153, 0.1);
+  --color-border-hover: rgba(52, 211, 153, 0.25);
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  --glass-bg: rgba(15, 21, 18, 0.8);
+  --glass-border: rgba(52, 211, 153, 0.1);
+  --glass-blur: 12px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(52, 211, 153, 0.15);
+  --shadow-glow-lg: 0 0 40px rgba(52, 211, 153, 0.25);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* ===== 기본 스타일 ===== */
+html, body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-bg-gradient);
+  min-height: 100vh;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(52, 211, 153, 0.3); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in-up { animation: fadeInUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.animate-fade-in { animation: fadeIn 0.3s ease forwards; }
+.animate-slide-in-right { animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* ===== 노이즈 텍스처 ===== */
+.noise-overlay { position: relative; }
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* ===== 글래스모피즘 ===== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+/* ===== 스크롤바 ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-border-hover); }
+
+/* ===== 버튼 공통 ===== */
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+/* ===== 선택 ===== */
+::selection {
+  background: var(--color-accent-muted);
+  color: var(--color-accent-hover);
+}
+
+/* ===== 포커스 링 ===== */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ===== 로고 링 애니메이션 ===== */
+@keyframes orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.logo-ring {
+  animation: orbit 8s linear infinite;
+  transform-origin: center;
+}
