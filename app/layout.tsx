@@ -3,12 +3,24 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Rooping — 영어 반복 학습',
-  description: '단어와 문장을 루프로 반복 학습하는 영어 학습 웹앱',
+  description: '단어·문장·문단을 루프로 반복 듣기로 학습하는 영어 학습 웹앱',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/icon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'Rooping',
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
   },
 }
 
@@ -16,7 +28,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#080c0a',
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#07130d',
 }
 
 export default function RootLayout({

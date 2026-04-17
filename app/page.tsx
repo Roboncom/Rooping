@@ -259,17 +259,17 @@ export default function Home() {
   const hasNoPassages = passages.length === 0
 
   return (
-    <main className="min-h-screen text-[var(--color-text)] relative noise-overlay overflow-hidden">
+    <main className="min-h-[100dvh] text-[var(--color-text)] relative noise-overlay overflow-hidden">
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-0 opacity-40"
+        className="pointer-events-none fixed inset-0 -z-0 opacity-60"
         style={{
           background:
-            'radial-gradient(500px circle at 20% 10%, rgba(52,211,153,0.12), transparent 60%), radial-gradient(400px circle at 85% 90%, rgba(110,231,183,0.08), transparent 60%)',
+            'radial-gradient(600px circle at 15% 0%, rgba(52,211,153,0.10), transparent 60%), radial-gradient(500px circle at 90% 100%, rgba(134,239,172,0.06), transparent 60%)',
         }}
       />
 
-      <div className="relative z-10 max-w-xl mx-auto px-4 py-6 sm:py-8 min-h-screen flex flex-col">
+      <div className="relative z-10 max-w-xl mx-auto px-3 sm:px-4 py-4 sm:py-8 min-h-[100dvh] flex flex-col safe-top safe-bottom">
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
           <Logo />
@@ -281,13 +281,13 @@ export default function Home() {
         </header>
 
         {/* Passage tabs */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+        <div className="mb-4 -mx-3 px-3 sm:mx-0 sm:px-0">
+          <div className="tabs-scroll flex items-center gap-2 pb-1">
             {passages.map(p => (
               <button
                 key={p.id}
                 onClick={() => { stopAudio(); setCurrentId(p.id) }}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                className={`flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-medium transition-all border no-select ${
                   currentId === p.id && editTargetId === null
                     ? 'bg-[var(--color-accent-muted)] text-[var(--color-accent)] border-[var(--color-accent)]'
                     : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:border-[var(--color-border-hover)]'
@@ -299,13 +299,13 @@ export default function Home() {
             ))}
             <button
               onClick={openNew}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 border ${
+              className={`flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 border no-select ${
                 editTargetId !== null
-                  ? 'bg-[var(--color-accent)] text-[#080c0a] border-[var(--color-accent)] shadow-[0_0_12px_rgba(52,211,153,0.35)]'
+                  ? 'bg-[var(--color-accent)] text-[var(--color-bg)] border-[var(--color-accent)] shadow-[0_0_16px_rgba(52,211,153,0.4)]'
                   : 'text-[var(--color-accent)] border-dashed border-[var(--color-border-hover)] hover:bg-[var(--color-accent-soft)]'
               }`}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M5 12h14" />
               </svg>
               입력
@@ -419,14 +419,14 @@ The quick brown fox jumps over the lazy dog.
                 </button>
               </div>
 
-              <div className="pt-8 pb-2">
-                <div className="max-h-[50vh] overflow-y-auto pr-1">
-                  <p className="font-[var(--font-display)] text-xl sm:text-2xl leading-relaxed whitespace-pre-wrap break-words">
+              <div className="pt-10 pb-2">
+                <div className="max-h-[40dvh] sm:max-h-[48dvh] overflow-y-auto pr-1 -mr-1">
+                  <p className="font-[var(--font-display)] text-lg sm:text-2xl leading-relaxed whitespace-pre-wrap break-words">
                     {currentPassage.content}
                   </p>
                 </div>
 
-                <div className="my-5">
+                <div className="my-4 sm:my-5">
                   <Equalizer isPlaying={isPlaying} />
                 </div>
               </div>
@@ -434,15 +434,15 @@ The quick brown fox jumps over the lazy dog.
           ) : null}
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+          <div className="flex items-center justify-center gap-4 sm:gap-5 mt-6 sm:mt-8 no-select">
             <button
               onClick={goPrev}
               aria-label="이전"
               disabled={passages.length < 2}
-              className="p-3 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]
-                hover:border-[var(--color-border-hover)] transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-14 h-14 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]
+                hover:border-[var(--color-border-hover)] transition-all active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
@@ -451,17 +451,17 @@ The quick brown fox jumps over the lazy dog.
               onClick={() => { if (isPlaying) stopAudio(); else playCurrent() }}
               disabled={!currentPassage}
               aria-label={isPlaying ? '정지' : '재생'}
-              className="p-4 rounded-xl bg-[var(--color-accent)] text-[#080c0a] hover:bg-[var(--color-accent-hover)]
-                active:scale-95 transition-all shadow-[0_0_20px_rgba(52,211,153,0.25)]
-                hover:shadow-[0_0_30px_rgba(52,211,153,0.4)] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-20 h-20 sm:w-[68px] sm:h-[68px] flex items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-bg)] hover:bg-[var(--color-accent-hover)]
+                active:scale-95 transition-all shadow-[var(--shadow-glow)]
+                hover:shadow-[var(--shadow-glow-lg)] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPlaying ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="5" width="4" height="14" rx="1" />
-                  <rect x="14" y="5" width="4" height="14" rx="1" />
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="5" width="4" height="14" rx="1.5" />
+                  <rect x="14" y="5" width="4" height="14" rx="1.5" />
                 </svg>
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               )}
@@ -471,10 +471,10 @@ The quick brown fox jumps over the lazy dog.
               onClick={goNext}
               aria-label="다음"
               disabled={passages.length < 2}
-              className="p-3 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]
-                hover:border-[var(--color-border-hover)] transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-14 h-14 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]
+                hover:border-[var(--color-border-hover)] transition-all active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </button>
@@ -482,30 +482,58 @@ The quick brown fox jumps over the lazy dog.
         </div>
 
         {/* Settings bar: 반복 횟수 + 배속 */}
-        <div className="mt-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+        <div className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-sm p-3 sm:p-4">
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex items-center justify-between gap-2 text-xs">
-              <span className="text-[var(--color-text-muted)]">반복</span>
-              <select
-                value={settings.repeatCount}
-                onChange={e => setSettings(s => ({ ...s, repeatCount: Number(e.target.value) }))}
-                className="flex-1 max-w-[90px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-2 py-1.5 text-sm focus:border-[var(--color-accent)] focus:outline-none"
-              >
-                {REPEAT_OPTIONS.map(n => <option key={n} value={n}>{n}회</option>)}
-              </select>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] font-mono">반복</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setSettings(s => {
+                    const i = REPEAT_OPTIONS.indexOf(s.repeatCount)
+                    return { ...s, repeatCount: REPEAT_OPTIONS[Math.max(0, i - 1)] }
+                  })}
+                  className="w-8 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  aria-label="반복 줄이기"
+                >−</button>
+                <div className="flex-1 h-9 flex items-center justify-center rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-accent)]">
+                  {settings.repeatCount}회
+                </div>
+                <button
+                  onClick={() => setSettings(s => {
+                    const i = REPEAT_OPTIONS.indexOf(s.repeatCount)
+                    return { ...s, repeatCount: REPEAT_OPTIONS[Math.min(REPEAT_OPTIONS.length - 1, i + 1)] }
+                  })}
+                  className="w-8 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  aria-label="반복 늘리기"
+                >+</button>
+              </div>
             </label>
-            <label className="flex items-center justify-between gap-2 text-xs">
-              <span className="text-[var(--color-text-muted)]">배속</span>
-              <select
-                value={settings.speed}
-                onChange={e => setSettings(s => ({ ...s, speed: Number(e.target.value) }))}
-                className="flex-1 max-w-[90px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-2 py-1.5 text-sm focus:border-[var(--color-accent)] focus:outline-none"
-              >
-                {SPEED_OPTIONS.map(s => <option key={s} value={s}>{s}x</option>)}
-              </select>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] font-mono">배속</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setSettings(s => {
+                    const i = SPEED_OPTIONS.indexOf(s.speed)
+                    return { ...s, speed: SPEED_OPTIONS[Math.max(0, i - 1)] }
+                  })}
+                  className="w-8 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  aria-label="배속 낮추기"
+                >−</button>
+                <div className="flex-1 h-9 flex items-center justify-center rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-accent)]">
+                  {settings.speed}x
+                </div>
+                <button
+                  onClick={() => setSettings(s => {
+                    const i = SPEED_OPTIONS.indexOf(s.speed)
+                    return { ...s, speed: SPEED_OPTIONS[Math.min(SPEED_OPTIONS.length - 1, i + 1)] }
+                  })}
+                  className="w-8 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] active:scale-95 transition-all"
+                  aria-label="배속 올리기"
+                >+</button>
+              </div>
             </label>
           </div>
-          <p className="mt-2 text-[10px] text-[var(--color-text-muted)] text-center font-mono">
+          <p className="mt-3 text-[10px] text-[var(--color-text-muted)] text-center font-mono hidden sm:block">
             Space 재생/정지 · ← → 이전/다음 글
           </p>
         </div>
