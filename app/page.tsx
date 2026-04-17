@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import type { LearnItem, DeckMode, Settings } from '@/lib/types'
 import { SAMPLE_ITEMS } from '@/lib/sample'
-import { parseList, serializeList } from '@/lib/parse'
+import { parseList, serializeList, dedupe } from '@/lib/parse'
 import { Logo } from '@/components/Logo'
 import { Equalizer } from '@/components/Equalizer'
 import { TimerRing } from '@/components/TimerRing'
@@ -42,7 +42,8 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [editText, setEditText] = useState('')
-  const [editKind, setEditKind] = useState<'word' | 'sentence'>('word')
+  const [editKind, setEditKind] = useState<'word' | 'sentence' | 'auto'>('auto')
+  const [editStrategy, setEditStrategy] = useState<'append' | 'replace'>('append')
   const [learnedIds, setLearnedIds] = useState<Set<string>>(new Set())
   const [cancelRequested, setCancelRequested] = useState(false)
 
@@ -267,17 +268,37 @@ export default function Home() {
     })
   }
 
-  const openEditor = (kind: 'word' | 'sentence') => {
+  const openEditor = (kind: 'word' | 'sentence' | 'auto' = 'auto') => {
     setEditKind(kind)
-    const source = allItems.filter(i => i.kind === kind)
-    setEditText(serializeList(source))
+    setEditStrategy('append')
+    setEditText('') // 기본은 빈 상태에서 붙여넣기 (기존 목록 보기 원하면 '현재 목록 불러오기' 버튼)
     setEditMode(true)
+  }
+
+  const handleLoadCurrent = () => {
+    // 현재 필터된 종류의 기존 항목을 textarea에 채움 (편집용)
+    const source =
+      editKind === 'auto'
+        ? allItems
+        : allItems.filter(i => i.kind === editKind)
+    setEditText(serializeList(source))
+    setEditStrategy('replace')
   }
 
   const handleSaveEdit = () => {
     const parsed = parseList(editText, editKind)
-    const other = allItems.filter(i => i.kind !== editKind)
-    const next = [...other, ...parsed]
+    if (parsed.length === 0) return
+    let next: LearnItem[]
+    if (editStrategy === 'replace') {
+      if (editKind === 'auto') {
+        next = parsed
+      } else {
+        const other = allItems.filter(i => i.kind !== editKind)
+        next = [...other, ...parsed]
+      }
+    } else {
+      next = dedupe([...allItems, ...parsed])
+    }
     setAllItems(next)
     setEditMode(false)
     setCurrentIndex(0)
@@ -315,8 +336,9 @@ export default function Home() {
               </svg>
             </button>
             <button
-              onClick={() => openEditor(mode === 'sentence' ? 'sentence' : 'word')}
+              onClick={() => openEditor('auto')}
               aria-label="목록 편집"
+              title="단어·문장 붙여넣기"
               className="p-2 rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -365,60 +387,118 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Edit panel */}
-        {editMode && (
-          <div className="mb-5 animate-fade-in-up">
-            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-[var(--color-text-muted)]">
-                  한 줄에 하나씩: 영어, 한국어 (쉼표·탭·| 구분)
-                </p>
-                <div className="flex gap-1 text-xs">
+        {/* Edit panel — 붙여넣기 · 저장 · 반복학습 */}
+        {editMode && (() => {
+          const parsed = parseList(editText, editKind)
+          const wordCnt = parsed.filter(i => i.kind === 'word').length
+          const sentCnt = parsed.filter(i => i.kind === 'sentence').length
+          return (
+            <div className="mb-5 animate-fade-in-up">
+              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-semibold mb-1">단어·문장 붙여넣기</h3>
+                  <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
+                    한 줄에 하나씩 <span className="font-mono text-[var(--color-accent)]">영어, 한국어</span> 형식으로 붙여넣으세요.<br />
+                    구분자는 <span className="font-mono">, / Tab / | / =</span> 중 무엇이든 OK — 마지막 구분자 기준으로 분리됩니다.
+                  </p>
+                </div>
+
+                {/* 분류 선택 */}
+                <div className="flex items-center gap-1 mb-2 text-xs">
+                  <span className="text-[var(--color-text-muted)] mr-1">분류</span>
+                  {([
+                    { id: 'auto', label: '자동 감지' },
+                    { id: 'word', label: '단어로' },
+                    { id: 'sentence', label: '문장으로' },
+                  ] as const).map(o => (
+                    <button
+                      key={o.id}
+                      onClick={() => setEditKind(o.id)}
+                      className={`px-2.5 py-1 rounded-md border transition-all ${
+                        editKind === o.id
+                          ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
+                          : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                      }`}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 저장 방식 */}
+                <div className="flex items-center gap-1 mb-3 text-xs">
+                  <span className="text-[var(--color-text-muted)] mr-1">방식</span>
+                  {([
+                    { id: 'append', label: '기존에 추가', hint: '중복은 자동 제거' },
+                    { id: 'replace', label: '전체 교체', hint: '기존 목록을 지우고 새로 만듦' },
+                  ] as const).map(o => (
+                    <button
+                      key={o.id}
+                      onClick={() => setEditStrategy(o.id)}
+                      title={o.hint}
+                      className={`px-2.5 py-1 rounded-md border transition-all ${
+                        editStrategy === o.id
+                          ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
+                          : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                      }`}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  value={editText}
+                  onChange={e => setEditText(e.target.value)}
+                  rows={10}
+                  autoFocus
+                  className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-3 text-sm font-mono
+                    focus:border-[var(--color-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]
+                    placeholder:text-[var(--color-text-muted)] resize-none"
+                  placeholder={`ubiquitous, 어디에나 있는
+ephemeral, 일시적인
+Could you say that again?, 다시 말씀해 주시겠어요?
+Let me think about it, 생각해 볼게요`}
+                />
+
+                {/* 미리보기 요약 */}
+                <div className="flex items-center justify-between mt-2 text-[11px] font-mono text-[var(--color-text-muted)]">
+                  <span>
+                    총 <span className="text-[var(--color-accent)]">{parsed.length}</span>개 ·
+                    단어 {wordCnt} · 문장 {sentCnt}
+                  </span>
                   <button
-                    onClick={() => { setEditKind('word'); setEditText(serializeList(allItems.filter(i => i.kind === 'word'))) }}
-                    className={`px-2 py-1 rounded-md ${editKind === 'word' ? 'bg-[var(--color-accent-muted)] text-[var(--color-accent)]' : 'text-[var(--color-text-muted)]'}`}
+                    onClick={handleLoadCurrent}
+                    className="hover:text-[var(--color-text)] underline underline-offset-2"
+                    title="기존 목록을 textarea에 불러와 편집 모드로 전환"
                   >
-                    단어
+                    현재 목록 불러오기
+                  </button>
+                </div>
+
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={parsed.length === 0}
+                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold
+                      bg-[var(--color-accent)] text-[#080c0a] hover:bg-[var(--color-accent-hover)]
+                      active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    저장하고 학습 시작 · {parsed.length}개
+                    {editStrategy === 'append' ? ' 추가' : ' 로 교체'}
                   </button>
                   <button
-                    onClick={() => { setEditKind('sentence'); setEditText(serializeList(allItems.filter(i => i.kind === 'sentence'))) }}
-                    className={`px-2 py-1 rounded-md ${editKind === 'sentence' ? 'bg-[var(--color-accent-muted)] text-[var(--color-accent)]' : 'text-[var(--color-text-muted)]'}`}
+                    onClick={() => setEditMode(false)}
+                    className="px-4 py-2.5 rounded-lg text-sm border border-[var(--color-border)]
+                      hover:bg-[var(--color-surface-hover)] transition-colors"
                   >
-                    문장
+                    취소
                   </button>
                 </div>
               </div>
-              <textarea
-                value={editText}
-                onChange={e => setEditText(e.target.value)}
-                rows={editKind === 'sentence' ? 10 : 8}
-                className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-3 text-sm font-mono
-                  focus:border-[var(--color-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]
-                  placeholder:text-[var(--color-text-muted)] resize-none"
-                placeholder={editKind === 'sentence'
-                  ? 'Could you say that again?, 다시 말씀해 주시겠어요?\nLet me think about it, 생각해 볼게요'
-                  : 'ubiquitous, 어디에나 있는\nephemeral, 일시적인'}
-              />
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={handleSaveEdit}
-                  className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold
-                    bg-[var(--color-accent)] text-[#080c0a] hover:bg-[var(--color-accent-hover)]
-                    active:scale-[0.98] transition-all"
-                >
-                  저장 ({parseList(editText, editKind).length}개)
-                </button>
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm border border-[var(--color-border)]
-                    hover:bg-[var(--color-surface-hover)] transition-colors"
-                >
-                  취소
-                </button>
-              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* Settings panel */}
         {settingsOpen && (
@@ -533,10 +613,10 @@ export default function Home() {
             <div className="w-full rounded-2xl border border-dashed border-[var(--color-border)] p-10 text-center text-[var(--color-text-muted)]">
               <p className="text-sm mb-2">이 모드에 항목이 없어요.</p>
               <button
-                onClick={() => openEditor(mode === 'sentence' ? 'sentence' : 'word')}
+                onClick={() => openEditor(mode === 'sentence' ? 'sentence' : mode === 'word' ? 'word' : 'auto')}
                 className="text-[var(--color-accent)] text-sm underline underline-offset-4"
               >
-                {mode === 'sentence' ? '문장' : '단어'} 추가하기
+                {mode === 'sentence' ? '문장' : mode === 'word' ? '단어' : '목록'} 붙여넣기
               </button>
             </div>
           ) : (
