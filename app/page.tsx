@@ -37,7 +37,8 @@ export default function Home() {
   const [currentRepeat, setCurrentRepeat] = useState(0)
 
   // 편집/입력 모드: null=닫힘, 문자열=편집 대상 ID, ''=새 글
-  const [editTargetId, setEditTargetId] = useState<string | null>(null)
+  // 기본 화면 = 새 글 입력 (빈 문자열로 시작)
+  const [editTargetId, setEditTargetId] = useState<string | null>('')
   const [editText, setEditText] = useState('')
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -364,7 +365,10 @@ The quick brown fox jumps over the lazy dog.
           </div>
         )}
 
-        {/* Card */}
+        {/* Card — 에디터 열린 상태에서는 숨김 (공간만 유지해 settings를 바닥에) */}
+        {editTargetId !== null ? (
+          <div className="flex-1" />
+        ) : (
         <div className="flex-1 flex flex-col items-center justify-center">
           {hasNoPassages ? (
             <div className="w-full rounded-2xl border border-dashed border-[var(--color-border)] p-10 text-center text-[var(--color-text-muted)]">
@@ -480,6 +484,7 @@ The quick brown fox jumps over the lazy dog.
             </button>
           </div>
         </div>
+        )}
 
         {/* Settings bar: 반복 횟수 + 배속 */}
         <div className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-sm p-3 sm:p-4">
